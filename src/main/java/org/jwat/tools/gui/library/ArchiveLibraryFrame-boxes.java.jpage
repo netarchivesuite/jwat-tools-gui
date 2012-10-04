@@ -1,0 +1,275 @@
+package dk.netarkivet.jwax.library;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.io.File;
+
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
+
+import com.antiaction.bittorrent.client.ui.JProgressBarTableCellRenderer;
+import com.antiaction.bittorrent.client.ui.JTextFieldValidFile;
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
+
+import dk.netarkivet.jwax.Desktop;
+
+/*
+ * Created on 21/11/2011
+ *
+ * TODO To change the template for this generated file go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+
+public class ArchiveLibraryFrame extends JInternalFrame implements ActionListener, ItemListener, FocusListener {
+
+	/**
+	 * UID
+	 */
+	private static final long serialVersionUID = -6666042833056936976L;
+
+	/** Shutdown boolean. */
+	//private boolean exit = false;
+
+	private final EmptyBorder border5 = new EmptyBorder( 5, 5, 5, 5 );
+
+	private final JLabel labelSource = new JLabel( "Source:" );
+	private final JTextField tfSource = new JTextFieldValidFile( 24 );
+	private final JButton buttonSelectSource = new JButton( "..." );
+	private final JButton buttonAdd = new JButton( "Add" );
+
+	/** Hashing table model. */
+	private ArchiveLibraryTableModel libraryTableModel;
+
+	/** Content JTable object. */
+	private JTable table;
+
+	private File sourceFile = null;
+
+	public ArchiveLibraryFrame() {
+		 //resizable, closable, maximizable, iconifiable
+		super( "Archive Library", true, true, true, true );
+
+		Box box = Box.createVerticalBox();
+		box.setBorder( border5 );
+
+		CellConstraints cc;
+
+		// Add
+
+		tfSource.setEditable( true );
+		tfSource.setActionCommand( "source.path" );
+		tfSource.addActionListener( this );
+		tfSource.addFocusListener( this );
+		buttonSelectSource.setEnabled( true );
+		buttonSelectSource.setActionCommand( "source.select" );
+		buttonSelectSource.addActionListener( this );
+		buttonAdd.setEnabled( false );
+		buttonAdd.setActionCommand( "source.add" );
+		buttonAdd.addActionListener( this );
+
+		Box sourceBox = Box.createVerticalBox();
+		Border sourceBorder = new TitledBorder( null, "Source Folder or File", TitledBorder.LEFT, TitledBorder.TOP );
+		sourceBox.setBorder( new CompoundBorder( sourceBorder, border5 ) );
+		box.add( sourceBox );
+
+		FormLayout sourceLayout = new FormLayout(
+				"right:pref, 4dlu, pref, 0dlu, left:pref, 4dlu, pref",			// columns
+				"pref" );											// rows
+
+		sourceLayout.setRowGroups( new int[][]{ { 1 } } );
+
+		JPanel sourcePanel = new JPanel( sourceLayout );
+
+		cc = new CellConstraints();
+		sourcePanel.add( labelSource, cc.xy( 1, 1 ) );
+		sourcePanel.add( tfSource, cc.xy( 3, 1 ) );
+		sourcePanel.add( buttonSelectSource, cc.xy( 5, 1 ) );
+		sourcePanel.add( buttonAdd, cc.xy( 7, 1) );
+
+		sourceBox.add( sourcePanel );
+
+		box.add( Box.createVerticalStrut( 8 ) );
+
+		// Table
+
+		Box libraryBox = Box.createVerticalBox();
+
+		libraryTableModel = new ArchiveLibraryTableModel();
+
+		table = new JTable( libraryTableModel );
+		table.getColumnModel().getColumn( 0 ).setPreferredWidth( 32 * 10 );
+		table.getColumnModel().getColumn( 1 ).setPreferredWidth( 32 * 10 );
+		table.getColumnModel().getColumn( 2 ).setPreferredWidth( 10 * 10 );
+		table.getColumnModel().getColumn( 3 ).setPreferredWidth( 8 * 10 );
+		table.getColumnModel().getColumn( 4 ).setPreferredWidth( 8 * 10 );
+
+		table.setSelectionMode( ListSelectionModel.SINGLE_SELECTION );
+
+		table.getColumn( "Progress" ).setCellRenderer( new JProgressBarTableCellRenderer() );
+
+		JScrollPane scrollpane = new JScrollPane( table );
+
+		libraryBox.add( scrollpane );
+
+		box.add( libraryBox );
+
+		// Content
+
+		box.add( Box.createVerticalStrut( 8 ) );
+
+		getContentPane().add( box );
+
+		pack();
+		setVisible( false );
+	}
+
+	public void focusGained(FocusEvent e) {
+	}
+
+	public void focusLost(FocusEvent e) {
+		/*
+		Component c = e.getComponent();
+		// debug
+		//System.out.println( c );
+		if ( c == tfSource ) {
+			String src = tfSource.getText();
+			if ( src != null && src.length() > 0 ) {
+				boolean bDialog = false;
+				if ( torrent == null || torrent_source_file == null ) {
+					bDialog = true;
+				}
+				else if ( torrent_source_file == null || src.compareTo( torrent_source_file.getPath() ) != 0 ) {
+					bDialog = true;
+				}
+				if ( bDialog ) {
+					int n = JOptionPane.showConfirmDialog( this, "Build torrent from path/file '" + src + "'?", "Build torrent", JOptionPane.YES_NO_OPTION );
+					if ( n == JOptionPane.YES_OPTION ) {
+						updateSource();
+					}
+				}
+			}
+		}
+		else if ( c == cbTorrentPath ) {
+			//torrentFile = new File( cbTorrentPath.getText() );
+			torrentPath = new File( (String)cbTorrentPath.getSelectedItem() );
+			if ( torrentPath != null && torrentPath.exists() && torrentFile != null ) {
+				torrentFile = new File( torrentPath, torrentFile.getName() );
+			}
+			checkState();
+		}
+			*/
+	}
+
+	public void itemStateChanged(ItemEvent e) {
+		/*
+		Object o = e.getItemSelectable();
+		if ( o instanceof JCheckBox ) {
+			JCheckBox cb = (JCheckBox)o;
+			int st = e.getStateChange();
+			String cmd = cb.getActionCommand();
+			if ( "tracker.private".equals( cmd ) ) {
+				if ( ItemEvent.SELECTED == st ) {
+					tracker_private = true;
+				}
+				else if ( ItemEvent.DESELECTED == st ) {
+					tracker_private = false;
+				}
+			}
+		}
+		*/
+	}
+
+	public void actionPerformed(ActionEvent e) {
+		// debug
+		//System.out.println( e.getActionCommand() );
+		String cmd = e.getActionCommand();
+		if ( cmd == null || cmd.length() == 0) {
+			return;
+		}
+		else if ( "source.path".equals( cmd ) ) {
+			//updateSource();
+		}
+		else if ( "source.select".equals( cmd ) ) {
+			selectSource();
+		}
+		else if ( "source.add".equals( cmd ) ) {
+			addSource();
+		}
+		else if ( "close".equals( cmd ) ) {
+			setVisible( false );
+		}
+	}
+
+	private void selectSource() {
+		JFileChooser jfile = new JFileChooser();
+		jfile.setDialogType( JFileChooser.OPEN_DIALOG );
+		jfile.setDialogTitle( "Select source" );
+		//jfile.setApproveButtonText( "Save" );
+		//jfile.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY );
+		jfile.setFileSelectionMode( JFileChooser.FILES_AND_DIRECTORIES );
+		jfile.setMultiSelectionEnabled( false );
+
+		if ( sourceFile != null ) {
+			if ( sourceFile.exists()) {
+				if ( sourceFile.isDirectory() ) {
+					jfile.setCurrentDirectory( sourceFile.getParentFile() );
+					jfile.setSelectedFile( sourceFile );
+				}
+				else {
+					jfile.setSelectedFile( sourceFile );
+				}
+			}
+			else {
+				jfile.setCurrentDirectory( sourceFile );
+				jfile.setSelectedFile( sourceFile );
+			}
+		}
+
+		// dialog
+		int returnVal = jfile.showOpenDialog( null );
+		if ( returnVal == JFileChooser.APPROVE_OPTION ) {
+			sourceFile = jfile.getSelectedFile();
+			// debug
+			//System.out.println( selectedFile.getPath() );
+			if ( !sourceFile.exists() ) {
+				JOptionPane.showMessageDialog( this, "Source '" + sourceFile.getPath() + "' does not exist.", "Source does not exist", JOptionPane.ERROR_MESSAGE );
+				sourceFile = null;
+			}
+			else {
+				tfSource.setText( sourceFile.getPath() );
+			}
+		}
+		if ( sourceFile != null && sourceFile.exists()) {
+			buttonAdd.setEnabled( true );
+		}
+	}
+
+	private void addSource() {
+		if ( sourceFile != null && sourceFile.exists() ) {
+			Desktop.scannerThread.add( sourceFile );
+		}
+	}
+
+	public void addFile(ArchiveFileBase archiveFile) {
+		libraryTableModel.add( archiveFile );
+	}
+
+}

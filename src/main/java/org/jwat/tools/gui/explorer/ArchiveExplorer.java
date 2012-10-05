@@ -2,20 +2,30 @@ package org.jwat.tools.gui.explorer;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
 import javax.swing.JTree;
-import javax.swing.UIManager;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
+
+import org.jwat.tools.gui.Lookup;
 
 /**
  * GUI enabling browsing of compressed ARC/WARC contents.
@@ -40,7 +50,9 @@ public class ArchiveExplorer extends JPanel implements TreeSelectionListener {
 
     private File file;
 
-	/**
+    private Lookup lookup;
+
+    /**
      * @param args Specifies the path to the input file.
      * 
      */
@@ -56,7 +68,15 @@ public class ArchiveExplorer extends JPanel implements TreeSelectionListener {
 
     public ArchiveExplorer(String archive, List<ArchiveEntry> entries) {
         super(new GridLayout(1, 0));
+
         file = new File(archive);
+        try {
+            lookup = Lookup.getInstance(file);
+        }
+        catch (IOException e) {
+        	e.printStackTrace();
+        }
+
         DefaultMutableTreeNode top = new DefaultMutableTreeNode(
                 "Archive Explorer");
         // TODO
@@ -120,15 +140,14 @@ public class ArchiveExplorer extends JPanel implements TreeSelectionListener {
         Object nodeInfo = node.getUserObject();
         if (node.isLeaf()) {
             ArchiveEntry entry = (ArchiveEntry) nodeInfo;
-            // TODO
-            //this.showArchiveRecord(entry);
+            this.showArchiveRecord(entry);
         }
     }
 
     private void createNodes(DefaultMutableTreeNode top, List<ArchiveEntry> entries) {
         try {
             ArchiveEntry dirEntry = new ArchiveEntry();
-            dirEntry.name = "Ze file";
+            dirEntry.name = file.getPath();
             DefaultMutableTreeNode root = new DefaultMutableTreeNode(dirEntry);
             top.add(root);
 
@@ -144,77 +163,55 @@ public class ArchiveExplorer extends JPanel implements TreeSelectionListener {
         }
     }
 
-    /*
     private void showArchiveRecord(ArchiveEntry entry) {
-        InputStream input = this.getPayloadStream(entry);
+        InputStream input = null;
         try {
-            if (entry.name.toLowerCase().matches("^.+\\.(jpg|gif|png|bmp)$")) {
-                StyledDocument doc = (StyledDocument) outputPane.getDocument();
-                Style style = doc.addStyle("StyleName", null);
+        	lookup.lookup_entry(entry.offset);
+            input = lookup.payload_inputstream;
+        	headerPane.setText(new String(lookup.header) + new String(lookup.payloadHeader));
 
-                byte[] image;
-                if (entry.name.matches("^.+\\.bmp$")) {
-                    BufferedImage bmp = ImageIO.read(input);
-                    ByteArrayOutputStream jpg = new ByteArrayOutputStream();
-                    ImageIO.write(bmp, "jpg", jpg);
-                    image = jpg.toByteArray();
+            outputPane.setText("");
+        	if (input != null) {
+            	if (entry.name.toLowerCase().matches("^.+\\.(jpg|gif|png|bmp)$")) {
+                    StyledDocument doc = (StyledDocument) outputPane.getDocument();
+                    Style style = doc.addStyle("StyleName", null);
+
+                    byte[] image;
+                    if (entry.name.matches("^.+\\.bmp$")) {
+                        BufferedImage bmp = ImageIO.read(input);
+                        ByteArrayOutputStream jpg = new ByteArrayOutputStream();
+                        ImageIO.write(bmp, "jpg", jpg);
+                        image = jpg.toByteArray();
+                    } else {
+                        //image = IOUtils.toByteArray(input);
+                    	image = new byte[lookup.payload_length];
+                    	int offset = 0;
+                    	int numread = 0;
+                    	while (numread != -1) {
+                    		offset += numread;
+                    		numread = input.read(image, offset, image.length - offset);
+                    	}
+                    }
+
+                    StyleConstants.setIcon(style, new ImageIcon(image));
+                    doc.insertString(0, "ignored text", style);
                 } else {
-                    image = IOUtils.toByteArray(input);
+                    outputPane.read(input, null);
                 }
-
-                StyleConstants.setIcon(style, new ImageIcon(image));
-                outputPane.setText("");
-                doc.insertString(0, "ignored text", style);
-            } else {
-                outputPane.read(input, null);
-            }
+        	}
             outputPane.setCaretPosition(0);
         } catch (Exception e) {
-            LOGGER.error(e.toString(), e);
+        	e.printStackTrace();
         } finally {
-            try {
-                input.close();
-            } catch (IOException e) {
-                LOGGER.error(e.toString(), e);
-            }
+        	if (input != null) {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                	e.printStackTrace();
+                }
+        	}
         }
     }
-    */
-
-    /*
-    private InputStream getPayloadStream(ArchiveEntry entry) {
-        Long offset = entry.header.getOffset();
-        RandomAccessFile random = null;
-        InputStream in = null;
-        StringBuilder headers = new StringBuilder();
-        try {
-            random = new RandomAccessFile(file, "r");
-            random.seek(offset);
-            if (random.getFilePointer() != offset) {
-                throw new IOException("Failed to seek to " + offset);
-            }
-            if (archiveReader.isCompressed()) {
-                in = new GZIPMembersInputStream(new FileInputStream(
-                        random.getFD()));
-                ((GZIPMembersInputStream) in).setEofEachMember(true);
-            } else {
-                in = new FileInputStream(random.getFD());
-                in = new BufferedInputStream(in, 65536);
-            }
-            headers.append(WARCRecordUtils.getHeaders(in, false));
-            if (!archiveReader.isCompressed()) {
-                in = new FixedLengthInputStream(in, entry.header.getLength());
-            }
-            if (entry.header.getHeaderValue(HEADER_KEY_TYPE) != null) {
-                headers.append(WARCRecordUtils.getHeaders(in, true));
-            }
-            headerPane.setText(headers.toString());
-        } catch (Exception e) {
-            LOGGER.error(e.toString(), e);
-        }
-        return in;
-    }
-    */
 
     /*
     private void openExternal(DefaultMutableTreeNode node) {

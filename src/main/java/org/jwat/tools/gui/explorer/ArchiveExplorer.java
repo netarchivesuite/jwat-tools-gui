@@ -187,7 +187,7 @@ public class ArchiveExplorer extends JPanel implements TreeSelectionListener {
                     	image = new byte[lookup.payload_length];
                     	int offset = 0;
                     	int numread = 0;
-                    	while (numread != -1) {
+                    	while (numread != -1 && offset < image.length) {
                     		offset += numread;
                     		numread = input.read(image, offset, image.length - offset);
                     	}

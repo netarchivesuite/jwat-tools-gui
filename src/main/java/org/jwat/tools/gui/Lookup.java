@@ -110,7 +110,6 @@ public class Lookup {
 	}
 
 	public void lookup_entry(long offset) throws IOException {
-		System.out.println(offset + " " + file.getPath());
 		close_entry();
 		raf.seek(offset);
 		if (raf.getFilePointer() != offset) {
@@ -126,6 +125,7 @@ public class Lookup {
 			if ( (gzipEntry = gzipReader.getNextEntry()) != null ) {
 				in = new ByteCountingPushBackInputStream( new BufferedInputStream( gzipEntry.getInputStream(), 8192 ), 16 );
 			}
+			break;
 		default:
 			in = pbin;
 			break;

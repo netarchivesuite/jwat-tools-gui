@@ -223,18 +223,27 @@ public class ArchiveLibraryFrame extends JInternalFrame implements ActionListene
 	}
 
 	public void mousePressed(MouseEvent e) {
-		/*
 		if ( e.getClickCount() == 1 ) {
 		}
 		if ( e.isPopupTrigger() ) {
 			JTable table = (JTable)e.getSource();
-			int rowNumber = table.rowAtPoint(e.getPoint());
-			if (rowNumber != -1) {
-				table.getSelectionModel().setSelectionInterval( rowNumber, rowNumber );
+			int rowIndex = table.rowAtPoint(e.getPoint());
+			if (rowIndex != -1) {
+				table.getSelectionModel().setSelectionInterval( rowIndex, rowIndex );
+
+				final ArchiveFileBase archiveFile = libraryTableModel.getAtRow(rowIndex);
+
+		        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+		            public void run() {
+						Indexer indexer = new Indexer();
+						List<ArchiveEntry> entries = indexer.index(archiveFile.file);
+						new ArchiveExplorer(archiveFile.file.getPath(), entries);
+		            }
+		        });
+
 			}
 			//showPopup( e );
 		}
-		*/
 	}
 
 	public void mouseReleased(MouseEvent e) {

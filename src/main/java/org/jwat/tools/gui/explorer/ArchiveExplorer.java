@@ -152,9 +152,18 @@ public class ArchiveExplorer extends JPanel implements TreeSelectionListener {
             top.add(root);
 
         	ArchiveEntry entry;
+        	StringBuilder sb = new StringBuilder();
             for (int i=0; i<entries.size(); ++i) {
             	entry = entries.get(i);
-                entry.name = entry.uri;
+            	sb.setLength(0);
+            	sb.append(entry.index);
+            	sb.append(": ");
+            	if (entry.uri != null) {
+            		sb.append(entry.uri);
+            	} else {
+            		sb.append("N/A");
+            	}
+                entry.name = sb.toString();
                 DefaultMutableTreeNode node = new DefaultMutableTreeNode(entry);
                 root.add(node);
             }

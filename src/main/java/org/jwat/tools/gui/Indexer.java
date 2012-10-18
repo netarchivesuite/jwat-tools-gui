@@ -17,15 +17,19 @@ public class Indexer implements ArchiveParserCallback {
 
 	protected List<ArchiveEntry> entries = new ArrayList<ArchiveEntry>();
 
+	protected int index;
+
 	public Indexer() {
 	}
 
 	public List<ArchiveEntry> index(File file) {
+		index = 0;
 		ArchiveParser archiveParser = new ArchiveParser();
 		archiveParser.uriProfile = UriProfile.RFC3986_ABS_16BIT_LAX;
 		archiveParser.bBlockDigestEnabled = false;
 		archiveParser.bPayloadDigestEnabled = false;
-		long consumed = archiveParser.parse(file, this);
+		//long consumed = archiveParser.parse(file, this);
+		archiveParser.parse(file, this);
 		return entries;
 	}
 
@@ -45,6 +49,7 @@ public class Indexer implements ArchiveParserCallback {
 	public void apcArcRecordStart(ArcRecordBase arcRecord, long startOffset,
 			boolean compressed) throws IOException {
 		ArchiveEntry entry = new ArchiveEntry();
+		entry.index = index++;
 		entry.bCompressed = compressed;
 		entry.offset = startOffset;
 		entry.uri = arcRecord.header.urlStr;
@@ -57,6 +62,7 @@ public class Indexer implements ArchiveParserCallback {
 	public void apcWarcRecordStart(WarcRecord warcRecord, long startOffset,
 			boolean compressed) throws IOException {
 		ArchiveEntry entry = new ArchiveEntry();
+		entry.index = index++;
 		entry.bCompressed = compressed;
 		entry.offset = startOffset;
 		entry.uri = warcRecord.header.warcTargetUriStr;

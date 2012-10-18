@@ -4,6 +4,8 @@ import java.util.Date;
 
 public class ArchiveEntry {
 
+	public int index;
+
 	public boolean bCompressed;
 
 	public long offset;

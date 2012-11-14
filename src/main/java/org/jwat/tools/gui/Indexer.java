@@ -34,7 +34,7 @@ public class Indexer implements ArchiveParserCallback {
 	}
 
 	@Override
-	public void apcFileId(int fileId) {
+	public void apcFileId(File file, int fileId) {
 	}
 
 	@Override
@@ -73,6 +73,10 @@ public class Indexer implements ArchiveParserCallback {
 
 	@Override
 	public void apcRuntimeError(Throwable t, long offset, long consumed) {
+	}
+
+	@Override
+	public void apcDone() {
 	}
 
 }

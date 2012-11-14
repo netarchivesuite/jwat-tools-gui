@@ -82,7 +82,7 @@
     <dependency>
       <groupId>org.jwat</groupId>
       <artifactId>jwat-tools</artifactId>
-      <version>0.5.4-SNAPSHOT</version>
+      <version>0.5.5-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.jgoodies</groupId>

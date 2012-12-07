@@ -31,11 +31,13 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import org.jwat.tools.gui.Desktop;
 import org.jwat.tools.gui.Indexer;
 import org.jwat.tools.gui.explorer.ArchiveEntry;
-import org.jwat.tools.gui.explorer.ArchiveExplorer;
+import org.jwat.tools.gui.lister.ArchiveLister;
 
 import com.antiaction.bittorrent.client.ui.JProgressBarTableCellRenderer;
 import com.antiaction.bittorrent.client.ui.JTextFieldValidFile;
@@ -150,6 +152,18 @@ public class ArchiveLibraryFrame extends JInternalFrame implements ActionListene
 
 		table.getColumn( "Progress" ).setCellRenderer( new JProgressBarTableCellRenderer() );
 
+		TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(table.getModel());
+		table.setRowSorter(sorter);
+		sorter.setSortsOnUpdates( true );
+
+		/*
+		List <RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+		sortKeys.add(new RowSorter.SortKey(1, SortOrder.DESCENDING));
+		sortKeys.add(new RowSorter.SortKey(2, SortOrder.DESCENDING));
+		sortKeys.add(new RowSorter.SortKey(3, SortOrder.DESCENDING));
+		sorter.setSortKeys(sortKeys); 
+		*/
+
 		JScrollPane scrollpane = new JScrollPane( table );
 
 		layoutPane.add( sourceBox, BorderLayout.PAGE_START );
@@ -231,13 +245,15 @@ public class ArchiveLibraryFrame extends JInternalFrame implements ActionListene
 			if (rowIndex != -1) {
 				table.getSelectionModel().setSelectionInterval( rowIndex, rowIndex );
 
+				rowIndex = table.getRowSorter().convertRowIndexToModel(rowIndex);
 				final ArchiveFileBase archiveFile = libraryTableModel.getAtRow(rowIndex);
 
 		        javax.swing.SwingUtilities.invokeLater(new Runnable() {
 		            public void run() {
 						Indexer indexer = new Indexer();
 						List<ArchiveEntry> entries = indexer.index(archiveFile.file);
-						new ArchiveExplorer(archiveFile.file.getPath(), entries);
+						//new ArchiveExplorer(archiveFile.file.getPath(), entries);
+						new ArchiveLister(archiveFile.file.getPath(), entries);
 		            }
 		        });
 
@@ -255,13 +271,15 @@ public class ArchiveLibraryFrame extends JInternalFrame implements ActionListene
 			if (rowIndex != -1) {
 				table.getSelectionModel().setSelectionInterval( rowIndex, rowIndex );
 
+				rowIndex = table.getRowSorter().convertRowIndexToModel(rowIndex);
 				final ArchiveFileBase archiveFile = libraryTableModel.getAtRow(rowIndex);
 
 		        javax.swing.SwingUtilities.invokeLater(new Runnable() {
 		            public void run() {
 						Indexer indexer = new Indexer();
 						List<ArchiveEntry> entries = indexer.index(archiveFile.file);
-						new ArchiveExplorer(archiveFile.file.getPath(), entries);
+						//new ArchiveExplorer(archiveFile.file.getPath(), entries);
+						new ArchiveLister(archiveFile.file.getPath(), entries);
 		            }
 		        });
 

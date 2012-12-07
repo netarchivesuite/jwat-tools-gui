@@ -36,6 +36,9 @@ import org.jwat.tools.gui.Lookup;
 
 public class ArchiveExplorer extends JPanel implements TreeSelectionListener {
 
+	/**
+	 * UID.
+	 */
 	private static final long serialVersionUID = -1104609882336524154L;
 
     private JTree tree;
@@ -77,13 +80,11 @@ public class ArchiveExplorer extends JPanel implements TreeSelectionListener {
         	e.printStackTrace();
         }
 
-        DefaultMutableTreeNode top = new DefaultMutableTreeNode(
-                "Archive Explorer");
+        DefaultMutableTreeNode top = new DefaultMutableTreeNode("Archive Explorer");
         // TODO
         this.createNodes(top, entries);
         tree = new JTree(top);
-        tree.getSelectionModel().setSelectionMode(
-                TreeSelectionModel.SINGLE_TREE_SELECTION);
+        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         tree.addTreeSelectionListener(this);
         /*
         tree.addMouseListener(new MouseAdapter() {
@@ -102,6 +103,7 @@ public class ArchiveExplorer extends JPanel implements TreeSelectionListener {
         outputPane = new JTextPane();
         outputPane.setEditable(false);
         outputView = new JScrollPane(outputPane);
+
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         splitPane.setTopComponent(treeView);
         splitPane.setResizeWeight(0.5d);
@@ -157,6 +159,9 @@ public class ArchiveExplorer extends JPanel implements TreeSelectionListener {
             	entry = entries.get(i);
             	sb.setLength(0);
             	sb.append(entry.index);
+            	sb.append("(");
+            	sb.append(entry.offset);
+            	sb.append(")");
             	sb.append(": ");
             	if (entry.uri != null) {
             		sb.append(entry.uri);
@@ -186,7 +191,7 @@ public class ArchiveExplorer extends JPanel implements TreeSelectionListener {
                     Style style = doc.addStyle("StyleName", null);
 
                     byte[] image;
-                    if (entry.name.matches("^.+\\.bmp$")) {
+                    if (entry.name.toLowerCase().matches("^.+\\.bmp$")) {
                         BufferedImage bmp = ImageIO.read(input);
                         ByteArrayOutputStream jpg = new ByteArrayOutputStream();
                         ImageIO.write(bmp, "jpg", jpg);

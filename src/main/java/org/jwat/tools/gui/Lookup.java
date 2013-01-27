@@ -143,7 +143,7 @@ public class Lookup {
 			arcReader.setPayloadDigestEnabled( bPayloadDigestEnabled );
 			arcRecord = arcReader.getNextRecordFrom( in, offset );
 			if (arcRecord != null) {
-				//arcRecord.header.
+				header = arcRecord.header.headerBytes;
 				payload = arcRecord.getPayload();
 				if (payload != null) {
 					PayloadWithHeaderAbstract payloadHeaderObject = payload.getPayloadHeaderWrapped();

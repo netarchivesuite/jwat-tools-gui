@@ -2,6 +2,8 @@ package org.jwat.tools.gui.lister;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -19,7 +21,9 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
@@ -30,11 +34,13 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
+import org.jwat.common.ContentType;
 import org.jwat.common.Diagnosis;
 import org.jwat.tools.gui.Lookup;
 import org.jwat.tools.gui.explorer.ArchiveEntry;
+import org.jwat.warc.WarcConstants;
 
-public class ArchiveLister extends JPanel implements KeyListener, MouseListener, WindowListener {
+public class ArchiveLister extends JPanel implements KeyListener, MouseListener, WindowListener, ActionListener {
 
 	/**
 	 * UID.
@@ -155,7 +161,7 @@ public class ArchiveLister extends JPanel implements KeyListener, MouseListener,
 			}
 		}
 		if ( e.isPopupTrigger() ) {
-			//showPopup( e );
+			showPopup( e );
 		}
 	}
 
@@ -172,7 +178,7 @@ public class ArchiveLister extends JPanel implements KeyListener, MouseListener,
 			}
 		}
 		if ( e.isPopupTrigger() ) {
-			//showPopup( e );
+			showPopup( e );
 		}
 	}
 
@@ -182,7 +188,19 @@ public class ArchiveLister extends JPanel implements KeyListener, MouseListener,
 	public void mouseExited(MouseEvent e) {
 	}
 
-    /**
+	public void showPopup(MouseEvent e) {
+		JPopupMenu menu = new JPopupMenu();
+		JMenuItem menuItem;
+		menuItem = menu.add( "Copy to clipboard" );
+		menuItem.setActionCommand( "clipboard" );
+		menuItem.addActionListener( this );
+		menuItem = menu.add( "Save record to file ..." );
+		menuItem.setActionCommand( "save" );
+		menuItem.addActionListener( this );
+		menu.show(e.getComponent(), e.getX(), e.getY());
+	}
+
+	/**
      * Invoked when a key has been typed.
      * See the class description for {@link java.awt.event.KeyEvent} for a definition of 
      * a key typed event.
@@ -248,6 +266,7 @@ public class ArchiveLister extends JPanel implements KeyListener, MouseListener,
 
     private void showArchiveRecord(ArchiveEntry entry) {
         InputStream input = null;
+        ContentType contentType;
         try {
         	lookup.lookup_entry(entry.offset);
             input = lookup.payload_inputstream;
@@ -262,32 +281,35 @@ public class ArchiveLister extends JPanel implements KeyListener, MouseListener,
 
             outputPane.setText("");
         	if (input != null) {
-            	if (entry.contentType != null && "image".equalsIgnoreCase(entry.contentType.contentType) && entry.contentType.mediaType.toLowerCase().matches("^.+\\.(jpg|gif|png|bmp)$")) {
-                    StyledDocument doc = (StyledDocument) outputPane.getDocument();
-                    Style style = doc.addStyle("StyleName", null);
+        		if (entry.contentType != null) {
+        			contentType = entry.contentType;
+                	if ("image".equalsIgnoreCase(contentType.contentType) && contentType.mediaType.toLowerCase().matches("^(jpg|jpeg|gif|png|bmp)$")) {
+                        StyledDocument doc = (StyledDocument) outputPane.getDocument();
+                        Style style = doc.addStyle("StyleName", null);
 
-                    byte[] image;
-                    if ("bmp".equalsIgnoreCase(entry.contentType.mediaType)) {
-                        BufferedImage bmp = ImageIO.read(input);
-                        ByteArrayOutputStream jpg = new ByteArrayOutputStream();
-                        ImageIO.write(bmp, "jpg", jpg);
-                        image = jpg.toByteArray();
-                    } else {
-                        //image = IOUtils.toByteArray(input);
-                    	image = new byte[lookup.payload_length];
-                    	int offset = 0;
-                    	int numread = 0;
-                    	while (numread != -1 && offset < image.length) {
-                    		offset += numread;
-                    		numread = input.read(image, offset, image.length - offset);
-                    	}
+                        byte[] image;
+                        if ("bmp".equalsIgnoreCase(contentType.mediaType)) {
+                            BufferedImage bmp = ImageIO.read(input);
+                            ByteArrayOutputStream jpg = new ByteArrayOutputStream();
+                            ImageIO.write(bmp, "jpg", jpg);
+                            image = jpg.toByteArray();
+                        } else {
+                            //image = IOUtils.toByteArray(input);
+                        	image = new byte[lookup.payload_length];
+                        	int offset = 0;
+                        	int numread = 0;
+                        	while (numread != -1 && offset < image.length) {
+                        		offset += numread;
+                        		numread = input.read(image, offset, image.length - offset);
+                        	}
+                        }
+
+                        StyleConstants.setIcon(style, new ImageIcon(image));
+                        doc.insertString(0, "ignored text", style);
+                    } else if ("text".equalsIgnoreCase(contentType.contentType) || (WarcConstants.CONTENT_TYPE_METADATA.equals(contentType.contentType) && WarcConstants.MEDIA_TYPE_METADATA.equals(contentType.mediaType))) {
+                        outputPane.read(input, null);
                     }
-
-                    StyleConstants.setIcon(style, new ImageIcon(image));
-                    doc.insertString(0, "ignored text", style);
-                } else {
-                    outputPane.read(input, null);
-                }
+        		}
         	}
             outputPane.setCaretPosition(0);
         } catch (Exception e) {
@@ -367,6 +389,11 @@ public class ArchiveLister extends JPanel implements KeyListener, MouseListener,
 				}
 			}
 		}
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		String command = e.getActionCommand();
 	}
 
 }

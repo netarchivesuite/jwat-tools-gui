@@ -76,6 +76,7 @@ public class Indexer implements ArchiveParserCallback {
             	}
             }
         }
+        arcRecord.close();
 		entry.diagnostics = arcRecord.diagnostics;
 		entries.add(entry);
 	}
@@ -106,6 +107,7 @@ public class Indexer implements ArchiveParserCallback {
             	}
             }
         }
+        warcRecord.close();
 		entry.diagnostics = warcRecord.diagnostics;
 		entries.add(entry);
 	}

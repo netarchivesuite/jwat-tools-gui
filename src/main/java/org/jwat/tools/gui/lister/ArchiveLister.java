@@ -309,6 +309,10 @@ public class ArchiveLister extends JPanel implements KeyListener, MouseListener,
                     } else if ("text".equalsIgnoreCase(contentType.contentType) || (WarcConstants.CONTENT_TYPE_METADATA.equals(contentType.contentType) && WarcConstants.MEDIA_TYPE_METADATA.equals(contentType.mediaType))) {
                         outputPane.read(input, null);
                     }
+        		} else {
+        			if (entry.contentLength < 16384) {
+                        outputPane.read(input, null);
+        			}
         		}
         	}
             outputPane.setCaretPosition(0);

@@ -9,6 +9,7 @@ import java.io.RandomAccessFile;
 import org.jwat.arc.ArcReader;
 import org.jwat.arc.ArcReaderFactory;
 import org.jwat.arc.ArcRecordBase;
+import org.jwat.archive.FileIdent;
 import org.jwat.common.ByteCountingPushBackInputStream;
 import org.jwat.common.Payload;
 import org.jwat.common.PayloadWithHeaderAbstract;
@@ -16,7 +17,6 @@ import org.jwat.common.RandomAccessFileInputStream;
 import org.jwat.common.UriProfile;
 import org.jwat.gzip.GzipEntry;
 import org.jwat.gzip.GzipReader;
-import org.jwat.tools.core.FileIdent;
 import org.jwat.warc.WarcReader;
 import org.jwat.warc.WarcReaderFactory;
 import org.jwat.warc.WarcRecord;
@@ -158,7 +158,7 @@ public class Lookup {
 		case FileIdent.FILEID_WARC_GZ:
 		case FileIdent.FILEID_WARC:
 			warcReader = WarcReaderFactory.getReaderUncompressed();
-			warcReader.setWarcTargerUriProfile(uriProfile);
+			warcReader.setWarcTargetUriProfile(uriProfile);
 			warcReader.setBlockDigestEnabled( bBlockDigestEnabled );
 			warcReader.setPayloadDigestEnabled( bPayloadDigestEnabled );
 			warcRecord = warcReader.getNextRecordFrom( in, offset );

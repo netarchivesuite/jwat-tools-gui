@@ -122,7 +122,7 @@ public abstract class ArchiveFileBase implements TestFileUpdateCallback {
 		testFile.validatorPlugins = new ArrayList<ValidatorPlugin>();
 		testFile.callback = this;
 
-		TestFileResult result = testFile.processFile(file);
+		TestFileResult result = testFile.processFile(file, null);
 	}
 
 	public List<ArchiveEntry> index() {

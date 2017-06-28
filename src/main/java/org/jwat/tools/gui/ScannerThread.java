@@ -11,7 +11,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jwat.tools.core.FileIdent;
+import org.jwat.archive.FileIdent;
 import org.jwat.tools.gui.library.ArchiveFileBase;
 import org.jwat.tools.gui.library.ArchiveFileImpl;
 
@@ -63,7 +63,7 @@ public class ScannerThread implements Runnable {
 
 	private void addFile(File file) {
 		ArchiveFileBase archiveFile;
-		int fileId;
+		FileIdent fileIdent;
 		if ( file.isDirectory() ) {
 			File[] files = file.listFiles();
 			for ( int i=0; i<files.length; ++i ) {
@@ -71,29 +71,83 @@ public class ScannerThread implements Runnable {
 					addFile( files[ i ] );
 				}
 				else if ( files[ i ].isFile() ) {
-					fileId = FileIdent.identFile(files[ i ]);
-					if (fileId > 0) {
-						archiveFile = new ArchiveFileImpl();
-						archiveFile.file = files[ i ];
-						archiveFile.path = files[ i ].getParent();
-						archiveFile.filename = files[ i ].getName();
-						archiveFile.fileSize = files[ i ].length();
-						Desktop.archiveLibraryFrame.addFile( archiveFile );
-						Desktop.validatorThread.add( archiveFile );
+					fileIdent = FileIdent.ident(files[ i ]);
+					if (file.length() > 0) {
+						// debug
+						//System.out.println(fileIdent.filenameId + " " + fileIdent.streamId + " " + srcFile.getName());
+						/*
+						if (fileIdent.filenameId != fileIdent.streamId) {
+						}
+						*/
+						switch (fileIdent.streamId) {
+						case FileIdent.FILEID_GZIP:
+						case FileIdent.FILEID_ARC:
+						case FileIdent.FILEID_ARC_GZ:
+						case FileIdent.FILEID_WARC:
+						case FileIdent.FILEID_WARC_GZ:
+							archiveFile = new ArchiveFileImpl();
+							archiveFile.file = files[ i ];
+							archiveFile.path = files[ i ].getParent();
+							archiveFile.filename = files[ i ].getName();
+							archiveFile.fileSize = files[ i ].length();
+							Desktop.archiveLibraryFrame.addFile( archiveFile );
+							Desktop.validatorThread.add( archiveFile );
+							break;
+						default:
+							break;
+						}
+					} else {
+						switch (fileIdent.filenameId) {
+						case FileIdent.FILEID_GZIP:
+						case FileIdent.FILEID_ARC:
+						case FileIdent.FILEID_ARC_GZ:
+						case FileIdent.FILEID_WARC:
+						case FileIdent.FILEID_WARC_GZ:
+							break;
+						default:
+							break;
+						}
 					}
 				}
 			}
 		}
 		else if ( file.isFile() ) {
-			fileId = FileIdent.identFile(file);
-			if (fileId > 0) {
-				archiveFile = new ArchiveFileImpl();
-				archiveFile.file = file;
-				archiveFile.path = file.getParent();
-				archiveFile.filename = file.getName();
-				archiveFile.fileSize = file.length();
-				Desktop.archiveLibraryFrame.addFile( archiveFile );
-				Desktop.validatorThread.add( archiveFile );
+			fileIdent = FileIdent.ident(file);
+			if (file.length() > 0) {
+				// debug
+				//System.out.println(fileIdent.filenameId + " " + fileIdent.streamId + " " + srcFile.getName());
+				/*
+				if (fileIdent.filenameId != fileIdent.streamId) {
+				}
+				*/
+				switch (fileIdent.streamId) {
+				case FileIdent.FILEID_GZIP:
+				case FileIdent.FILEID_ARC:
+				case FileIdent.FILEID_ARC_GZ:
+				case FileIdent.FILEID_WARC:
+				case FileIdent.FILEID_WARC_GZ:
+					archiveFile = new ArchiveFileImpl();
+					archiveFile.file = file;
+					archiveFile.path = file.getParent();
+					archiveFile.filename = file.getName();
+					archiveFile.fileSize = file.length();
+					Desktop.archiveLibraryFrame.addFile( archiveFile );
+					Desktop.validatorThread.add( archiveFile );
+					break;
+				default:
+					break;
+				}
+			} else {
+				switch (fileIdent.filenameId) {
+				case FileIdent.FILEID_GZIP:
+				case FileIdent.FILEID_ARC:
+				case FileIdent.FILEID_ARC_GZ:
+				case FileIdent.FILEID_WARC:
+				case FileIdent.FILEID_WARC_GZ:
+					break;
+				default:
+					break;
+				}
 			}
 		}
 	}

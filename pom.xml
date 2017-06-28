@@ -58,31 +58,40 @@
     </developer>
   </developers>
 
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <jwat.version>1.0.4</jwat.version>
+    <jwat.tools.version>0.6.2</jwat.tools.version>
+    <assembly.home.env.name>JWATTTOOLSGUI_HOME</assembly.home.env.name>
+    <assembly.home.env.name.ref>${JWATTTOOLSGUI_HOME}</assembly.home.env.name.ref>
+    <assembly.main.class.name>org.jwat.tools.gui.Desktop</assembly.main.class.name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.jwat</groupId>
       <artifactId>jwat-common</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${jwat.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jwat</groupId>
       <artifactId>jwat-gzip</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${jwat.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jwat</groupId>
       <artifactId>jwat-arc</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${jwat.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jwat</groupId>
       <artifactId>jwat-warc</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>${jwat.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jwat</groupId>
       <artifactId>jwat-tools</artifactId>
-      <version>0.5.5-SNAPSHOT</version>
+      <version>${jwat.tools.version}</version>
     </dependency>
     <dependency>
       <groupId>com.jgoodies</groupId>
@@ -121,13 +130,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <assembly.home.env.name>JWATTTOOLSGUI_HOME</assembly.home.env.name>
-    <assembly.home.env.name.ref>${JWATTTOOLSGUI_HOME}</assembly.home.env.name.ref>
-    <assembly.main.class.name>org.jwat.tools.gui.Desktop</assembly.main.class.name>
-  </properties>
 
   <build>
 
@@ -191,13 +193,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <profiles>
-    <profile>
-      <id>alternative</id>
-      <properties>
-        <maven.test.failure.ignore>true</maven.test.failure.ignore>
-      </properties>
-    </profile>
-  </profiles>
 </project>

@@ -30,7 +30,7 @@ public class ArchiveTableModel implements TableModel {
 	/** Array of column names. */
 	private String[] columnNames = { "Index", "Errors", "Warnings", "Offset", "Target-URI", "WARC-Date", "Content-Length" };
 	/** Array of column classes. */
-	private Class<?>[] columnClasses = { Integer.class, Integer.class, Integer.class, Long.class, String.class, Date.class, Long.class };
+	private Class<?>[] columnClasses = { Integer.class, Integer.class, Integer.class, String.class, String.class, Date.class, Long.class };
 
 	/** Backend list of table entries. */
 	private List<ArchiveEntry> rows = new ArrayList<ArchiveEntry>();
@@ -115,7 +115,7 @@ public class ArchiveTableModel implements TableModel {
 			case 2:
 				return archiveEntry.diagnostics.getWarnings().size();
 			case 3:
-				return archiveEntry.offset;
+				return archiveEntry.offsetStr;
 			case 4:
 				return archiveEntry.uri;
 			case 5:

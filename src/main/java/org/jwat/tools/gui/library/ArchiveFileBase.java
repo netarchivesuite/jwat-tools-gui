@@ -22,6 +22,7 @@ import org.jwat.tools.gui.explorer.ArchiveEntry;
 import org.jwat.tools.tasks.test.TestFile2;
 import org.jwat.tools.tasks.test.TestFileResult;
 import org.jwat.tools.tasks.test.TestFileUpdateCallback;
+import org.jwat.tools.tasks.test.TestOptions;
 
 public abstract class ArchiveFileBase implements TestFileUpdateCallback {
 
@@ -117,12 +118,13 @@ public abstract class ArchiveFileBase implements TestFileUpdateCallback {
 		ratio = (double)Integer.MAX_VALUE / (double)fileSize;
 
 		TestFile2 testFile = new TestFile2();
-		testFile.bShowErrors = false;
-		testFile.uriProfile = UriProfile.RFC3986_ABS_16BIT_LAX;
-		testFile.validatorPlugins = new ArrayList<ValidatorPlugin>();
+		TestOptions options = new TestOptions();
+		options.bShowErrors = false;
+		options.uriProfile = UriProfile.RFC3986_ABS_16BIT_LAX;
+		options.validatorPlugins = new ArrayList<ValidatorPlugin>();
 		testFile.callback = this;
 
-		TestFileResult result = testFile.processFile(file, null);
+		TestFileResult result = testFile.processFile(file, options, null);
 	}
 
 	public List<ArchiveEntry> index() {

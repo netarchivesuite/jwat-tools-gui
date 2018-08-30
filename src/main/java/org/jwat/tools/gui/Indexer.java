@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jwat.arc.ArcHeader;
+import org.jwat.arc.ArcReader;
 import org.jwat.arc.ArcRecordBase;
 import org.jwat.archive.ArchiveParser;
 import org.jwat.archive.ArchiveParserCallback;
@@ -13,8 +14,10 @@ import org.jwat.common.ContentType;
 import org.jwat.common.HttpHeader;
 import org.jwat.common.UriProfile;
 import org.jwat.gzip.GzipEntry;
+import org.jwat.gzip.GzipReader;
 import org.jwat.tools.gui.explorer.ArchiveEntry;
 import org.jwat.warc.WarcHeader;
+import org.jwat.warc.WarcReader;
 import org.jwat.warc.WarcRecord;
 
 public class Indexer implements ArchiveParserCallback {
@@ -50,13 +53,13 @@ public class Indexer implements ArchiveParserCallback {
 	}
 
 	@Override
-	public void apcArcRecordStart(ArcRecordBase arcRecord, long startOffset,
-			boolean compressed) throws IOException {
+	public void apcArcRecordStart(ArcRecordBase arcRecord, long startOffset, boolean compressed) throws IOException {
 		ArcHeader header = arcRecord.header;
 		ArchiveEntry entry = new ArchiveEntry();
 		entry.index = index++;
 		entry.bCompressed = compressed;
 		entry.offset = startOffset;
+		entry.offsetStr = Long.toHexString(startOffset) + " / " + Long.toString(startOffset);
 		entry.uri = arcRecord.header.urlStr;
 		entry.date = arcRecord.header.archiveDate;
 		entry.contentLength = arcRecord.header.archiveLength;
@@ -89,6 +92,7 @@ public class Indexer implements ArchiveParserCallback {
 		entry.index = index++;
 		entry.bCompressed = compressed;
 		entry.offset = startOffset;
+		entry.offsetStr = Long.toHexString(startOffset) + " / " + Long.toString(startOffset);
 		entry.uri = warcRecord.header.warcTargetUriStr;
 		entry.date = warcRecord.header.warcDate;
 		entry.contentLength = warcRecord.header.contentLength;
@@ -117,7 +121,7 @@ public class Indexer implements ArchiveParserCallback {
 	}
 
 	@Override
-	public void apcDone() {
+	public void apcDone(GzipReader gzipReader, ArcReader arcReader, WarcReader warcReader) {
 	}
 
 }

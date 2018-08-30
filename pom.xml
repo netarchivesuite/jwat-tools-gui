@@ -11,7 +11,7 @@
 
   <groupId>org.jwat</groupId>
   <artifactId>jwat-tools-gui</artifactId>
-  <version>0.2.0-SNAPSHOT</version>
+  <version>0.3.0-SNAPSHOT</version>
 
   <packaging>jar</packaging>
 
@@ -60,8 +60,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jwat.version>1.0.4</jwat.version>
-    <jwat.tools.version>0.6.2</jwat.tools.version>
+    <jwat.version>1.1.1</jwat.version>
+    <jwat.tools.version>0.6.7</jwat.tools.version>
     <assembly.home.env.name>JWATTTOOLSGUI_HOME</assembly.home.env.name>
     <assembly.home.env.name.ref>${JWATTTOOLSGUI_HOME}</assembly.home.env.name.ref>
     <assembly.main.class.name>org.jwat.tools.gui.Desktop</assembly.main.class.name>

@@ -14,6 +14,8 @@ public class ArchiveEntry {
 
 	public long offset;
 
+	public String offsetStr;
+
 	public String uri;
 
 	public Date date;

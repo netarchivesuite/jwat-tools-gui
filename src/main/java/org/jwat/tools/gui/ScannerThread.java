@@ -10,13 +10,11 @@ package org.jwat.tools.gui;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 import org.jwat.archive.FileIdent;
 import org.jwat.tools.gui.library.ArchiveFileBase;
 import org.jwat.tools.gui.library.ArchiveFileImpl;
-
-import com.antiaction.multithreading.concurrent.Multex;
-import com.antiaction.multithreading.concurrent.Mutex;
 
 
 public class ScannerThread implements Runnable {
@@ -24,8 +22,8 @@ public class ScannerThread implements Runnable {
 	/** Shutdown boolean. */
 	private boolean exit = false;
 
-	private Mutex lock = new Mutex( 0 );
-	private Multex queued = new Multex( 0 );
+	private Semaphore lock = new Semaphore( 1 );
+	private Semaphore queued = new Semaphore( 0 );
 	private List<File> events = new ArrayList<File>();
 
 	public ScannerThread() {
@@ -38,25 +36,42 @@ public class ScannerThread implements Runnable {
 	}
 
 	public void add(File archiveFile) {
-		lock.obtainSemaphore();
-		events.add( archiveFile );
-		lock.releaseSemaphore();
-		queued.releaseSemaphore();
+		while (archiveFile != null) {
+			try {
+				lock.acquire();
+				events.add( archiveFile );
+				archiveFile = null;
+				lock.release();
+				queued.release();
+			}
+			catch (InterruptedException e) {
+			}
+		}
 	}
 
 	public void run() {
 		File archiveFile;
 		while ( !exit ) {
-			queued.obtainSemaphore();
-
-			// Retrieve job.
-			lock.obtainSemaphore();
-			archiveFile = events.remove( 0 );
-			lock.releaseSemaphore();
-
-			// Process job.
-			if ( archiveFile != null ) {
-				addFile( archiveFile );
+			try {
+				// Wait for job.
+				queued.acquire();
+				archiveFile = null;
+				// Retrieve job.
+				while (archiveFile == null) {
+					try {
+						lock.acquire();
+						archiveFile = events.remove( 0 );
+						lock.release();
+					}
+					catch (InterruptedException e) {
+					}
+				}
+				// Process job.
+				if ( archiveFile != null ) {
+					addFile( archiveFile );
+				}
+			}
+			catch (InterruptedException e) {
 			}
 		}
 	}

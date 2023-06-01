@@ -16,6 +16,7 @@ import org.jwat.common.UriProfile;
 import org.jwat.gzip.GzipEntry;
 import org.jwat.gzip.GzipReader;
 import org.jwat.tools.gui.explorer.ArchiveEntry;
+import org.jwat.warc.WarcDate;
 import org.jwat.warc.WarcHeader;
 import org.jwat.warc.WarcReader;
 import org.jwat.warc.WarcRecord;
@@ -33,8 +34,8 @@ public class Indexer implements ArchiveParserCallback {
 		index = 0;
 		ArchiveParser archiveParser = new ArchiveParser();
 		archiveParser.uriProfile = UriProfile.RFC3986_ABS_16BIT_LAX;
-		archiveParser.bBlockDigestEnabled = false;
-		archiveParser.bPayloadDigestEnabled = false;
+		archiveParser.bBlockDigestEnabled = true;
+		archiveParser.bPayloadDigestEnabled = true;
 		//long consumed = archiveParser.parse(file, this);
 		archiveParser.parse(file, this);
 		return entries;
@@ -61,7 +62,8 @@ public class Indexer implements ArchiveParserCallback {
 		entry.offset = startOffset;
 		entry.offsetStr = Long.toHexString(startOffset) + " / " + Long.toString(startOffset);
 		entry.uri = arcRecord.header.urlStr;
-		entry.date = arcRecord.header.archiveDate;
+		//entry.date = arcRecord.header.archiveDate;
+		entry.date = WarcDate.fromLocalDate(arcRecord.header.archiveDate);
 		entry.contentLength = arcRecord.header.archiveLength;
 		entry.contentType = header.contentType;
 		// TODO

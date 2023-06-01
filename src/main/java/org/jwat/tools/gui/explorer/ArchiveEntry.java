@@ -1,10 +1,8 @@
 package org.jwat.tools.gui.explorer;
 
-import java.util.Date;
-
 import org.jwat.common.ContentType;
-import org.jwat.common.Diagnosis;
 import org.jwat.common.Diagnostics;
+import org.jwat.warc.WarcDate;
 
 public class ArchiveEntry {
 
@@ -18,7 +16,7 @@ public class ArchiveEntry {
 
 	public String uri;
 
-	public Date date;
+	public WarcDate date;
 
 	public long contentLength;
 
@@ -26,7 +24,7 @@ public class ArchiveEntry {
 
 	public String name;
 
-	public Diagnostics<Diagnosis> diagnostics;
+	public Diagnostics diagnostics;
 
 	public String toString() {
         return name;

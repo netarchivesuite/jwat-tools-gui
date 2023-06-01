@@ -13,6 +13,7 @@ import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
@@ -157,7 +158,7 @@ public class ArchiveLister extends JPanel implements KeyListener, MouseListener,
 
 				rowIndex = table.getRowSorter().convertRowIndexToModel(rowIndex);
 				final ArchiveEntry archiveEntry = archiveTableModel.getAtRow(rowIndex);
-	            showArchiveRecord(archiveEntry);
+				showArchiveRecord(archiveEntry);
 			}
 		}
 		if ( e.isPopupTrigger() ) {
@@ -174,7 +175,7 @@ public class ArchiveLister extends JPanel implements KeyListener, MouseListener,
 
 				rowIndex = table.getRowSorter().convertRowIndexToModel(rowIndex);
 				final ArchiveEntry archiveEntry = archiveTableModel.getAtRow(rowIndex);
-	            showArchiveRecord(archiveEntry);
+				showArchiveRecord(archiveEntry);
 			}
 		}
 		if ( e.isPopupTrigger() ) {
@@ -189,15 +190,31 @@ public class ArchiveLister extends JPanel implements KeyListener, MouseListener,
 	}
 
 	public void showPopup(MouseEvent e) {
-		JPopupMenu menu = new JPopupMenu();
-		JMenuItem menuItem;
-		menuItem = menu.add( "Copy to clipboard" );
-		menuItem.setActionCommand( "clipboard" );
-		menuItem.addActionListener( this );
-		menuItem = menu.add( "Save record to file ..." );
-		menuItem.setActionCommand( "save" );
-		menuItem.addActionListener( this );
-		menu.show(e.getComponent(), e.getX(), e.getY());
+		popupMenuArchiveEntry = null;
+		JTable table = (JTable)e.getSource();
+		// TODO Check for identical Table.
+		//System.out.println(e.getSource());
+		//System.out.println(table);
+		int rowIndex = table.rowAtPoint(e.getPoint());
+		if (rowIndex != -1) {
+			// Get visual row index.
+			table.getSelectionModel().setSelectionInterval(rowIndex, rowIndex);
+			// Get row index in sorted order.
+			rowIndex = table.getRowSorter().convertRowIndexToModel(rowIndex);
+			popupMenuArchiveEntry = archiveTableModel.getAtRow(rowIndex);
+			// Debug
+			//System.out.println(popupMenuArchiveEntry.index + " " + popupMenuArchiveEntry.offset);
+
+			JPopupMenu menu = new JPopupMenu();
+			JMenuItem menuItem;
+			menuItem = menu.add( "Copy to clipboard" );
+			menuItem.setActionCommand( "clipboard" );
+			menuItem.addActionListener( this );
+			menuItem = menu.add( "Save record to file ..." );
+			menuItem.setActionCommand( "save" );
+			menuItem.addActionListener( this );
+			menu.show(e.getComponent(), e.getX(), e.getY());
+		}
 	}
 
 	/**
@@ -221,7 +238,7 @@ public class ArchiveLister extends JPanel implements KeyListener, MouseListener,
 			if (idx != -1) {
 				idx = table.getRowSorter().convertRowIndexToModel(idx);
 				ArchiveEntry archiveEntry = archiveTableModel.getAtRow(idx);
-	            showArchiveRecord(archiveEntry);
+				showArchiveRecord(archiveEntry);
 			}
 			event.consume();
 		}
@@ -395,9 +412,48 @@ public class ArchiveLister extends JPanel implements KeyListener, MouseListener,
 		}
 	}
 
+	protected ArchiveEntry popupMenuArchiveEntry;
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String command = e.getActionCommand();
+		System.out.println(command);
+		if ("clipboard".equals(command)) {
+		}
+		else if ("save".equals(command)) {
+			FileOutputStream out = null;
+			InputStream input = null;
+			byte[] buffer = new byte[8192];
+			int read;
+			try {
+				out = new FileOutputStream(new File("extracted." + popupMenuArchiveEntry.index), false);
+	        	lookup.lookup_entry(popupMenuArchiveEntry.offset);
+	            input = lookup.payload_inputstream;
+	            out.write(lookup.header);
+	            out.write(lookup.payloadHeader);
+	            while ((read = input.read(buffer)) != -1) {
+	            	out.write(buffer, 0, read);
+	            }
+			}
+			catch (IOException ex) {
+			}
+			finally {
+				if (input != null) {
+					try {
+						input.close();
+					}
+					catch (IOException ex) {
+					}
+				}
+				if (out != null) {
+					try {
+						out.close();
+					}
+					catch (IOException ex) {
+					}
+				}
+			}
+		}
 	}
 
 }

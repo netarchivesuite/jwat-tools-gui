@@ -38,9 +38,9 @@ import org.jwat.tools.gui.Desktop;
 import org.jwat.tools.gui.Indexer;
 import org.jwat.tools.gui.explorer.ArchiveEntry;
 import org.jwat.tools.gui.lister.ArchiveLister;
+import org.jwat.tools.gui.ui.JProgressBarTableCellRenderer;
+import org.jwat.tools.gui.ui.JTextFieldValidFile;
 
-import com.antiaction.bittorrent.client.ui.JProgressBarTableCellRenderer;
-import com.antiaction.bittorrent.client.ui.JTextFieldValidFile;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 

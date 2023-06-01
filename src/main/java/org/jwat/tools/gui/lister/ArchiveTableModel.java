@@ -1,7 +1,6 @@
 package org.jwat.tools.gui.lister;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -12,6 +11,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
 import org.jwat.tools.gui.explorer.ArchiveEntry;
+import org.jwat.warc.WarcDate;
 
 public class ArchiveTableModel implements TableModel {
 
@@ -30,7 +30,7 @@ public class ArchiveTableModel implements TableModel {
 	/** Array of column names. */
 	private String[] columnNames = { "Index", "Errors", "Warnings", "Offset", "Target-URI", "WARC-Date", "Content-Length" };
 	/** Array of column classes. */
-	private Class<?>[] columnClasses = { Integer.class, Integer.class, Integer.class, String.class, String.class, Date.class, Long.class };
+	private Class<?>[] columnClasses = { Integer.class, Integer.class, Integer.class, String.class, String.class, WarcDate.class, Long.class };
 
 	/** Backend list of table entries. */
 	private List<ArchiveEntry> rows = new ArrayList<ArchiveEntry>();

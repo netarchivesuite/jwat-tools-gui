@@ -121,6 +121,7 @@ public abstract class ArchiveFileBase implements TestFileUpdateCallback {
 		TestOptions options = new TestOptions();
 		options.bShowErrors = false;
 		options.uriProfile = UriProfile.RFC3986_ABS_16BIT_LAX;
+		options.bValidateDigest = true;
 		options.validatorPlugins = new ArrayList<ValidatorPlugin>();
 		testFile.callback = this;
 

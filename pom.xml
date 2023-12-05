@@ -1,196 +1,295 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.sonatype.oss</groupId>
-    <artifactId>oss-parent</artifactId>
-    <version>7</version>
-  </parent>
+	<groupId>org.jwat</groupId>
+	<artifactId>jwat-tools-gui</artifactId>
+	<version>0.3.0-SNAPSHOT</version>
 
-  <groupId>org.jwat</groupId>
-  <artifactId>jwat-tools-gui</artifactId>
-  <version>0.3.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
 
-  <packaging>jar</packaging>
+	<name>jwat-tools</name>
+	<description>A GUI for the test command in JWAT Tools. Also includes a rudimentary record viewer.</description>
+	<url>http://jwat.org/</url>
 
-  <name>jwat-tools</name>
-  <description>JWAT Tools</description>
-  <url>http://jwat.org/</url>
+	<inceptionYear>2011</inceptionYear>
 
-  <inceptionYear>2011</inceptionYear>
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+			<comments>A business-friendly OSS license</comments>
+		</license>
+	</licenses>
 
-  <!--licenses>
-    <license>
-      <name>Apache License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-      <comments>A business-friendly OSS license</comments>
-    </license>
-  </licenses-->
+	<scm>
+		<connection>scm:git:https://github.com/netarchivesuite/jwat-tools-gui.git</connection>
+		<developerConnection>scm:git:https://github.com/netarchivesuite/jwat-tools.git</developerConnection>
+		<url>https://github.com/netarchivesuite/jwat-tools-gui</url>
+	</scm>
 
-  <!--scm>
-    <connection>scm:hg:http://bitbucket.org/nclarkekb/jwat-tools</connection>
-    <developerConnection>scm:hg:https://bitbucket.org/nclarkekb/jwat-tools</developerConnection>
-    <url>http://bitbucket.org/nclarkekb/jwat-tools</url>
-  </scm-->
+	<developers>
+		<developer>
+			<name>Nicholas Clarke</name>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<email>nclarke@antiaction.com</email>
+			<organization>Antiaction</organization>
+			<organizationUrl>https://www.antiaction.com</organizationUrl>
+		</developer>
 
-  <!--issueManagement>
-    <system>jira</system> 
-    <url>https://sbforge.org/jira/browse/JWAT</url> 
-  </issueManagement-->
+		<developer>
+			<name>Nicholas Clarke</name>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<email>nicl@kb.dk</email>
+			<organization>Det Kongelige Bibliotek/Royal Danish Library</organization>
+			<organizationUrl>http://www.kb.dk</organizationUrl>
+		</developer>
+	</developers>
 
-  <!--ciManagement>
-    <system>jenkins</system>
-    <url>https://sbforge.org/jenkins/view/JWAT/</url>
-  </ciManagement-->
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-  <developers>
-    <developer>
-      <name>Nicholas Clarke</name>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <email>nicl@kb.dk</email>
-      <organization>Det Kongelige Bibliotek/Royal Danish Library</organization>
-      <organizationUrl>http://www.kb.dk</organizationUrl>
-    </developer>
-  </developers>
+		<checkstyle.localeCountry>en</checkstyle.localeCountry>
+		<checkstyle.cache.file>checkstyleCache</checkstyle.cache.file>
+		<license.skip>false</license.skip>
+		<jacoco.skip>true</jacoco.skip>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jwat.version>1.1.1</jwat.version>
-    <jwat.tools.version>0.6.7</jwat.tools.version>
-    <assembly.home.env.name>JWATTTOOLSGUI_HOME</assembly.home.env.name>
-    <assembly.home.env.name.ref>${JWATTTOOLSGUI_HOME}</assembly.home.env.name.ref>
-    <assembly.main.class.name>org.jwat.tools.gui.Desktop</assembly.main.class.name>
-  </properties>
+		<maven.assembly.plugin>2.2.2</maven.assembly.plugin>
+		<maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+		<maven-gpg-plugin.version>3.0.1</maven-gpg-plugin.version>
+		<maven.jar.plugin>2.3</maven.jar.plugin>
+		<maven-javadoc-plugin.version>3.3.0</maven-javadoc-plugin.version>
+		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.jwat</groupId>
-      <artifactId>jwat-common</artifactId>
-      <version>${jwat.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jwat</groupId>
-      <artifactId>jwat-gzip</artifactId>
-      <version>${jwat.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jwat</groupId>
-      <artifactId>jwat-arc</artifactId>
-      <version>${jwat.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jwat</groupId>
-      <artifactId>jwat-warc</artifactId>
-      <version>${jwat.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jwat</groupId>
-      <artifactId>jwat-tools</artifactId>
-      <version>${jwat.tools.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.jgoodies</groupId>
-      <artifactId>jgoodies-common</artifactId>
-      <version>1.4.0</version>
-    </dependency>
-    <dependency>
-      <groupId>com.jgoodies</groupId>
-      <artifactId>jgoodies-forms</artifactId>
-      <version>1.6.0</version>
-    </dependency>
-    <dependency>
-      <groupId>com.jgoodies</groupId>
-      <artifactId>jgoodies-looks</artifactId>
-      <version>2.5.2</version>
-      <type>pom</type>
-    </dependency>
-    <dependency>
-      <groupId>com.antiaction</groupId>
-      <artifactId>commons-debug</artifactId>
-      <version>0.1.0-SNAPSHOT</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/lib/antiaction-commons-debug.jar</systemPath>
-    </dependency> 
-    <dependency>
-      <groupId>com.antiaction</groupId>
-      <artifactId>bittorrent-client</artifactId>
-      <version>0.1.0-SNAPSHOT</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/lib/bittorrent-client.jar</systemPath>
-    </dependency> 
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.10</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+		<license.maven.plugin>2.0.0</license.maven.plugin>
 
-  <build>
+		<assembly.home.env.name>JWATTTOOLSGUI_HOME</assembly.home.env.name>
+		<assembly.home.env.name.ref>${JWATTTOOLSGUI_HOME}</assembly.home.env.name.ref>
+		<assembly.main.class.name>org.jwat.tools.gui.Desktop</assembly.main.class.name>
 
-   <!--filters>
-      <filter>src/main/assembly/filter.properties</filter>
-    </filters-->
+		<jwat.tools.version>0.7.2-SNAPSHOT</jwat.tools.version>
+		<junit.version>4.13.2</junit.version>
+	</properties>
 
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
-      </plugin>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<!-->url>https://s01.oss.sonatype.org/content/repositories/snapshots</url-->
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<!-->url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url-->
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
 
-      <!-- generate the JWAT-Tools Command Line jar executable -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>2.3</version>
-        <configuration>
-          <archive>
-            <addMavenDescriptor>false</addMavenDescriptor>
-            <!-- make jar executable -->
-            <manifest>
-              <mainClass>org.jwat.tools.gui.Desktop</mainClass>
-            </manifest>
-            <manifestEntries>
-              <Sealed>false</Sealed>
-            </manifestEntries>
-          </archive>
-           <forceCreation>true</forceCreation>
-          <finalName>${project.build.finalName}</finalName>
-        </configuration>
-      </plugin>
-      <!--
-        package the jar, artifacts,and bin scripts into zip and tar files
-        for JWAT-Tools release
-      -->
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.2.2</version>
-        <executions>
-          <execution>
-            <id>distro-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <descriptors>
-                <descriptor>src/main/assembly/release.xml</descriptor>
-              </descriptors>
-              <appendAssemblyId>false</appendAssemblyId>
-              <tarLongFileMode>gnu</tarLongFileMode>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+	<dependencies>
+		<dependency>
+			<groupId>org.jwat</groupId>
+			<artifactId>jwat-tools</artifactId>
+			<version>${jwat.tools.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.jgoodies</groupId>
+			<artifactId>jgoodies-common</artifactId>
+			<version>1.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.jgoodies</groupId>
+			<artifactId>jgoodies-forms</artifactId>
+			<version>1.6.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.jgoodies</groupId>
+			<artifactId>jgoodies-looks</artifactId>
+			<version>2.5.2</version>
+			<type>pom</type>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<!--filters>
+			<filter>src/main/assembly/filter.properties</filter>
+		</filters-->
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+				<!-- Profiles used to make this work with jdk8 vs jdk9+.
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<release>8</release>
+				</configuration>
+				-->
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>${license.maven.plugin}</version>
+				<configuration>
+					<generateBundle>true</generateBundle>
+					<licenseName>apache_v2</licenseName>
+					<failIfWarning>true</failIfWarning>
+					<useMissingFile>true</useMissingFile>
+				</configuration>
+			</plugin>
+
+			<!-- generate the JWAT-Tools Command Line jar executable -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>${maven.jar.plugin}</version>
+				<configuration>
+					<archive>
+						<addMavenDescriptor>false</addMavenDescriptor>
+						<!-- make jar executable -->
+						<manifest>
+							<mainClass>org.jwat.tools.gui.Desktop</mainClass>
+						</manifest>
+						<manifestEntries>
+							<Specification-Title>${project.name}</Specification-Title>
+							<Specification-Version>${project.version}</Specification-Version>
+							<!--Specification-Vendor>${project.specification_vendor}</Specification-Vendor-->
+							<Implementation-Title>${project.groupId}.${project.artifactId}</Implementation-Title>
+							<!--Implementation-Version>${git.revision}</Implementation-Version-->
+							<!--Implementation-Vendor>${project.implementation_vendor}</Implementation-Vendor-->
+							<!--X-Git-Branch>${git.branch}</X-Git-Branch-->
+							<!--X-Git-Tag>${git.tag}</X-Git-Tag-->
+							<!--X-Git-Commits-Count>${git.commitsCount}</X-Git-Commits-Count-->
+							<Sealed>false</Sealed>
+						</manifestEntries>
+					</archive>
+					 <forceCreation>true</forceCreation>
+					<finalName>${project.build.finalName}</finalName>
+				</configuration>
+			</plugin>
+			<!--
+				package the jar, artifacts,and bin scripts into zip and tar files
+				for JWAT-Tools release
+			-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>${maven.assembly.plugin}</version>
+				<executions>
+					<execution>
+						<id>distro-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>src/main/assembly/release.xml</descriptor>
+							</descriptors>
+							<appendAssemblyId>false</appendAssemblyId>
+							<tarLongFileMode>gnu</tarLongFileMode>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>javac8-release</id>
+			<activation>
+				<jdk>8</jdk>
+			</activation>
+			<properties>
+				<maven.compiler.source>1.8</maven.compiler.source>
+				<maven.compiler.target>1.8</maven.compiler.target>
+			</properties>
+		</profile>
+		<profile>
+			<id>javac9-release</id>
+			<activation>
+				<jdk>[9,)</jdk>
+			</activation>
+			<properties>
+				<maven.compiler.release>8</maven.compiler.release>
+			</properties>
+		</profile>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<!-- Generate source jar. (http://maven.apache.org/plugins/maven-source-plugin/usage.html) -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>${maven-source-plugin.version}</version>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>jar-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- Generate javadoc jar. Note: Java 8 (doclint) check has been disabled. -->
+					<plugin> 
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId> 
+						<version>${maven-javadoc-plugin.version}</version>
+						<configuration>
+							<source>8</source>
+							<detectJavaApiLink>false</detectJavaApiLink>
+							<aggregate>true</aggregate>
+							<linksource>true</linksource>
+							<quiet>true</quiet>
+							<!-- Note: This fails with a JVM older than Java 8 -->
+							<additionalparam>-Xdoclint:none</additionalparam>
+						</configuration>
+						<executions> 
+							<execution> 
+								<id>attach-javadocs</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>jar</goal>
+								</goals> 
+							</execution> 
+						</executions> 
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>${maven-gpg-plugin.version}</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

@@ -162,7 +162,9 @@ public class Desktop extends JFrame implements WindowListener, ActionListener {
 		setVisible( false );
 		dispose();
 
+		scannerThread.exit();
 		validatorThread.exit();
+		System.exit(0);
 	}
 
 	public static void main(String[] args) {

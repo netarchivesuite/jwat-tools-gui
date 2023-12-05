@@ -9,11 +9,9 @@ package org.jwat.tools.gui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 import org.jwat.tools.gui.library.ArchiveFileBase;
-
-import com.antiaction.multithreading.concurrent.Multex;
-import com.antiaction.multithreading.concurrent.Mutex;
 
 
 public class ValidatorThread implements Runnable {
@@ -21,8 +19,8 @@ public class ValidatorThread implements Runnable {
 	/** Shutdown boolean. */
 	private boolean exit = false;
 
-	private Mutex lock = new Mutex( 0 );
-	private Multex queued = new Multex( 0 );
+	private Semaphore lock = new Semaphore( 1 );
+	private Semaphore queued = new Semaphore( 0 );
 	private List<ArchiveFileBase> events = new ArrayList<ArchiveFileBase>();
 
 	public ValidatorThread() {
@@ -35,25 +33,42 @@ public class ValidatorThread implements Runnable {
 	}
 
 	public void add(ArchiveFileBase archiveFile) {
-		lock.obtainSemaphore();
-		events.add( archiveFile );
-		lock.releaseSemaphore();
-		queued.releaseSemaphore();
+		while (archiveFile != null) {
+			try {
+				lock.acquire();
+				events.add( archiveFile );
+				archiveFile = null;
+				lock.release();
+				queued.release();
+			}
+			catch (InterruptedException e) {
+			}
+		}
 	}
 
 	public void run() {
 		ArchiveFileBase archiveFile;
 		while ( !exit ) {
-			queued.obtainSemaphore();
-
-			// Retrieve job.
-			lock.obtainSemaphore();
-			archiveFile = events.remove( 0 );
-			lock.releaseSemaphore();
-
-			// Process job.
-			if ( archiveFile != null ) {
-				archiveFile.validate();
+			try {
+				// Wait for job.
+				queued.acquire();
+				archiveFile = null;
+				// Retrieve job.
+				while (archiveFile == null) {
+					try {
+						lock.acquire();
+						archiveFile = events.remove( 0 );
+						lock.release();
+					}
+					catch (InterruptedException e) {
+					}
+				}
+				// Process job.
+				if ( archiveFile != null ) {
+					archiveFile.validate();
+				}
+			}
+			catch (InterruptedException e) {
 			}
 		}
 	}

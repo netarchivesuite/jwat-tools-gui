@@ -3,12 +3,6 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.sonatype.oss</groupId>
-		<artifactId>oss-parent</artifactId>
-		<version>7</version>
-	</parent>
-
 	<groupId>org.jwat</groupId>
 	<artifactId>jwat-tools-gui</artifactId>
 	<version>0.3.0-SNAPSHOT</version>
@@ -16,7 +10,7 @@
 	<packaging>jar</packaging>
 
 	<name>jwat-tools</name>
-	<description>JWAT Tools</description>
+	<description>A GUI for the test command in JWAT Tools. Also includes a rudimentary record viewer.</description>
 	<url>http://jwat.org/</url>
 
 	<inceptionYear>2011</inceptionYear>
@@ -60,12 +54,42 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+		<checkstyle.localeCountry>en</checkstyle.localeCountry>
+		<checkstyle.cache.file>checkstyleCache</checkstyle.cache.file>
+		<license.skip>false</license.skip>
+		<jacoco.skip>true</jacoco.skip>
+
+		<maven.assembly.plugin>2.2.2</maven.assembly.plugin>
+		<maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+		<maven-gpg-plugin.version>3.0.1</maven-gpg-plugin.version>
+		<maven.jar.plugin>2.3</maven.jar.plugin>
+		<maven-javadoc-plugin.version>3.3.0</maven-javadoc-plugin.version>
+		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
+
+		<license.maven.plugin>2.0.0</license.maven.plugin>
+
 		<assembly.home.env.name>JWATTTOOLSGUI_HOME</assembly.home.env.name>
 		<assembly.home.env.name.ref>${JWATTTOOLSGUI_HOME}</assembly.home.env.name.ref>
 		<assembly.main.class.name>org.jwat.tools.gui.Desktop</assembly.main.class.name>
+
 		<jwat.tools.version>0.7.2-SNAPSHOT</jwat.tools.version>
 		<junit.version>4.13.2</junit.version>
 	</properties>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<!-->url>https://s01.oss.sonatype.org/content/repositories/snapshots</url-->
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<!-->url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url-->
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
 
 	<dependencies>
 		<dependency>
@@ -104,11 +128,27 @@
 
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
+				<version>${maven-compiler-plugin.version}</version>
+				<!-- Profiles used to make this work with jdk8 vs jdk9+.
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
+					<release>8</release>
+				</configuration>
+				-->
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>${license.maven.plugin}</version>
+				<configuration>
+					<generateBundle>true</generateBundle>
+					<licenseName>apache_v2</licenseName>
+					<failIfWarning>true</failIfWarning>
+					<useMissingFile>true</useMissingFile>
 				</configuration>
 			</plugin>
 
@@ -116,7 +156,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3</version>
+				<version>${maven.jar.plugin}</version>
 				<configuration>
 					<archive>
 						<addMavenDescriptor>false</addMavenDescriptor>
@@ -125,6 +165,15 @@
 							<mainClass>org.jwat.tools.gui.Desktop</mainClass>
 						</manifest>
 						<manifestEntries>
+							<Specification-Title>${project.name}</Specification-Title>
+							<Specification-Version>${project.version}</Specification-Version>
+							<!--Specification-Vendor>${project.specification_vendor}</Specification-Vendor-->
+							<Implementation-Title>${project.groupId}.${project.artifactId}</Implementation-Title>
+							<!--Implementation-Version>${git.revision}</Implementation-Version-->
+							<!--Implementation-Vendor>${project.implementation_vendor}</Implementation-Vendor-->
+							<!--X-Git-Branch>${git.branch}</X-Git-Branch-->
+							<!--X-Git-Tag>${git.tag}</X-Git-Tag-->
+							<!--X-Git-Commits-Count>${git.commitsCount}</X-Git-Commits-Count-->
 							<Sealed>false</Sealed>
 						</manifestEntries>
 					</archive>
@@ -137,8 +186,9 @@
 				for JWAT-Tools release
 			-->
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2.2</version>
+				<version>${maven.assembly.plugin}</version>
 				<executions>
 					<execution>
 						<id>distro-assembly</id>
@@ -158,4 +208,88 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>javac8-release</id>
+			<activation>
+				<jdk>8</jdk>
+			</activation>
+			<properties>
+				<maven.compiler.source>1.8</maven.compiler.source>
+				<maven.compiler.target>1.8</maven.compiler.target>
+			</properties>
+		</profile>
+		<profile>
+			<id>javac9-release</id>
+			<activation>
+				<jdk>[9,)</jdk>
+			</activation>
+			<properties>
+				<maven.compiler.release>8</maven.compiler.release>
+			</properties>
+		</profile>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<!-- Generate source jar. (http://maven.apache.org/plugins/maven-source-plugin/usage.html) -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>${maven-source-plugin.version}</version>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>jar-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- Generate javadoc jar. Note: Java 8 (doclint) check has been disabled. -->
+					<plugin> 
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId> 
+						<version>${maven-javadoc-plugin.version}</version>
+						<configuration>
+							<source>8</source>
+							<detectJavaApiLink>false</detectJavaApiLink>
+							<aggregate>true</aggregate>
+							<linksource>true</linksource>
+							<quiet>true</quiet>
+							<!-- Note: This fails with a JVM older than Java 8 -->
+							<additionalparam>-Xdoclint:none</additionalparam>
+						</configuration>
+						<executions> 
+							<execution> 
+								<id>attach-javadocs</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>jar</goal>
+								</goals> 
+							</execution> 
+						</executions> 
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>${maven-gpg-plugin.version}</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
